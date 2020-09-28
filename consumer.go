@@ -1,19 +1,19 @@
 package kafkaesque
 
-import(
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"github.com/reactivex/rxgo" //"github.com/reactivex/rxgo/v2"
+import (
 	"fmt"
-	"log"
+	"github.com/reactivex/rxgo/v2"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
+// Consumer holds the observables and channels in one struct.
 type Consumer struct {
-	Config			*Config,
-	Topics			[]string,
-	eventChannel 	chan interface{},
-	infoChannel 	chan interface{},
-	Infos			*rxgo.Observable,
-	Events			*rxgo.Observable,
+	Config       *Config
+	Topics       []string
+	eventChannel chan rxgo.Item
+	infoChannel  chan rxgo.Item
+	Infos        rxgo.Observable
+	Events       rxgo.Observable
 }
 
 func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
@@ -23,25 +23,26 @@ func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
 		ev := consumer.Poll(0)
 		switch e := ev.(type) {
 		case *kafka.Message:
-			c.eventChannel <- e
+			c.eventChannel <- rxgo.Of(e)
 		case kafka.PartitionEOF:
-			c.infoChannel  <- e
+			c.infoChannel <- rxgo.Of(e)
 		case kafka.Error:
-			c.infoChannel  <- e
+			c.infoChannel <- rxgo.Of(e)
 			break
 		default:
-			c.infoChannel  <- e
+			c.infoChannel <- rxgo.Of(e)
 		}
 	}
 }
 
-func (c *Consumer) Open() err {
-	if len(topics) == 0 {
-		return fmt.Errorf("Creating a consumer without topics is not permitted.")
+// Open start the consumer.
+func (c *Consumer) Open() error {
+	if len(c.Topics) == 0 {
+		return fmt.Errorf("Creating a consumer without topics is not permitted")
 	}
-	c.eventChannel = make(chan interface{})
-	c.infoChannel  = make(chan interface{})
-	consumer, err := kafka.NewConsumer(c.Config)
+	c.eventChannel = make(chan rxgo.Item)
+	c.infoChannel = make(chan rxgo.Item)
+	consumer, err := kafka.NewConsumer(c.Config.Map())
 	if err != nil {
 		return err
 	}
@@ -58,15 +59,20 @@ func (c *Consumer) Open() err {
 	return nil
 }
 
+// Close stop the consumer.
 func (c *Consumer) Close() {
 	//TODO: implement close channel
 	return
 }
 
-func NewConsumer(config *Config, Topics []string) (*Consumer, err) {
+// NewConsumer creates a Consumer via config and topics.
+func NewConsumer(config *Config, topics []string) (*Consumer, error) {
 	consumer := &Consumer{
 		Config: config,
 		Topics: topics,
 	}
 	return consumer, consumer.Open()
 }
+
+// Event mapping of confluent Message
+type Event kafka.Message
