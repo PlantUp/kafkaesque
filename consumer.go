@@ -23,7 +23,7 @@ func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
 		ev := consumer.Poll(0)
 		switch e := ev.(type) {
 		case *kafka.Message:
-			c.eventChannel <- rxgo.Of(e)
+			c.eventChannel <- rxgo.Of(Event(e))
 		case kafka.PartitionEOF:
 			c.infoChannel <- rxgo.Of(e)
 		case kafka.Error:
@@ -66,13 +66,10 @@ func (c *Consumer) Close() {
 }
 
 // NewConsumer creates a Consumer via config and topics.
-func NewConsumer(config *Config, topics []string) (*Consumer, error) {
+func NewConsumer(config *Config, topics ...string) (*Consumer, error) {
 	consumer := &Consumer{
 		Config: config,
 		Topics: topics,
 	}
 	return consumer, consumer.Open()
 }
-
-// Event mapping of confluent Message
-type Event kafka.Message
