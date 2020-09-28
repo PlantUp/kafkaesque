@@ -20,18 +20,12 @@ func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
 	defer consumer.Close()
 	for {
 		//TODO: Add break point
-		ev := consumer.Poll(0)
-		switch e := ev.(type) {
-		case *kafka.Message:
-			c.eventChannel <- rxgo.Of(Event(e))
-		case kafka.PartitionEOF:
-			c.infoChannel <- rxgo.Of(e)
-		case kafka.Error:
-			c.infoChannel <- rxgo.Of(e)
-			break
-		default:
-			c.infoChannel <- rxgo.Of(e)
+		ev, err := consumer.ReadMessage(-1)
+		if err != nil {
+			c.infoChannel <- rxgo.Of(err)
+			continue
 		}
+		c.eventChannel <- rxgo.Of(Event(ev))
 	}
 }
 
