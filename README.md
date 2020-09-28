@@ -70,5 +70,5 @@ for event := range bookRequests.Observe() {
 The output should be:
 ```
 2020/09/28 12:12:08 Showing events:
-2020/09/28 12:12:11 Moby Dick
+2020/09/28 12:12:11 main.BookRequest
 ```
