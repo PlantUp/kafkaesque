@@ -38,6 +38,7 @@ func main() {
 			err := json.Unmarshal(kafkaesque.ValueToBytes(item), &request)
 			return request, err
 		})
+	defer testConsumer.Close()
 	for event := range bookRequests.Observe() {
 		log.Println(fmt.Sprintf("%T", event.V))
 	}

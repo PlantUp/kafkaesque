@@ -2,6 +2,7 @@ package kafkaesque
 
 import (
 	"fmt"
+
 	"github.com/reactivex/rxgo/v2"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -12,20 +13,36 @@ type Consumer struct {
 	Topics       []string
 	eventChannel chan rxgo.Item
 	infoChannel  chan rxgo.Item
+	closeChannel chan bool
 	Infos        rxgo.Observable
 	Events       rxgo.Observable
+}
+
+// InfoEvent hold error and message
+type InfoEvent struct {
+	Error   error
+	Message Event
 }
 
 func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
 	defer consumer.Close()
 	for {
-		//TODO: Add break point
-		ev, err := consumer.ReadMessage(-1)
-		if err != nil {
-			c.infoChannel <- rxgo.Of(err)
-			continue
+		select {
+		case <-c.closeChannel:
+			return
+		default:
+			ev, err := consumer.ReadMessage(-1)
+			if err != nil {
+				c.infoChannel <- rxgo.Of(
+					&InfoEvent{
+						Error:   err,
+						Message: ev,
+					},
+				)
+				continue
+			}
+			c.eventChannel <- rxgo.Of(Event(ev))
 		}
-		c.eventChannel <- rxgo.Of(Event(ev))
 	}
 }
 
@@ -55,7 +72,7 @@ func (c *Consumer) Open() error {
 
 // Close stop the consumer.
 func (c *Consumer) Close() {
-	//TODO: implement close channel
+	c.closeChannel <- true
 	return
 }
 
