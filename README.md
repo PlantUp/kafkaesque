@@ -1,6 +1,8 @@
 
 ![kafkaesque logo](assets/logo.png)
 # Reactive consumers for Apache Kafka
+[![Go Report Card](https://goreportcard.com/badge/github.com/PlantUp/kafkaesque)](https://goreportcard.com/report/github.com/PlantUp/kafkaesque)  
+
 This is a simple package for using Kafka in Golang with the Observer-pattern.
 
 ## Example
