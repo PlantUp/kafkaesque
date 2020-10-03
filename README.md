@@ -56,7 +56,7 @@ for event := range bookRequests.Observe() {
     ```
 2. Start the program:
     ```bash
-    go run .
+    go run . -name test_consumer -topics test
     ```
 3. In a new terminal run:
     ```bash
@@ -66,9 +66,23 @@ for event := range bookRequests.Observe() {
     ```json
     {"book": "Moby Dick", "person": "Max Musterknabe"}
     ```
+    The output should be:
+    ```
+    2020/10/03 15:32:08 Showing events for [test test1 test2] on [localhost:9092]:
+    2020/10/03 15:32:16 Book:	Moby Dick	Person:	Max Musterknabe
+    ```
+   **Or** start the example as producer:
+     ```bash
+	 go run . -mode producer -name test_producer -topics test
+	 ```
 
-The output should be:
-```
-2020/09/28 12:12:08 Showing events:
-2020/09/28 12:12:11 main.BookRequest
-```
+    The output should be:
+    ```
+    2020/10/03 15:32:08 Showing events for [test test1 test2] on [localhost:9092]:
+    2020/10/03 15:32:16 Book:	10 Awesome Ways to Photograph Blue Bottles	Person:	Pamela Osborne
+    2020/10/03 15:33:02 Book:	10 Awesome Ways to Photograph Blue Bottles	Person:	Pamela Osborne
+    2020/10/03 15:33:02 Book:	21 Myths About Blue bottles Debunked	Person:	Inayah Brown
+    2020/10/03 15:33:02 Book:	How to Make Your Own Vast Hat for less than £5	Person:	Ikrah Blair
+    2020/10/03 15:33:03 Book:	An analysis of handsome jugs	Person:	Aurora Stafford
+                                    ...
+    ```

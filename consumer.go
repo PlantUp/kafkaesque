@@ -47,15 +47,13 @@ func (c *Consumer) consumeToChannel(consumer *kafka.Consumer) {
 }
 
 // Open start the consumer.
-func (c *Consumer) Open() error {
+func (c *Consumer) Open() (*Consumer, error) {
 	if len(c.Topics) == 0 {
-		return fmt.Errorf("Creating a consumer without topics is not permitted")
+		return nil, fmt.Errorf("Creating a consumer without topics is not permitted")
 	}
-	c.eventChannel = make(chan rxgo.Item)
-	c.infoChannel = make(chan rxgo.Item)
 	consumer, err := kafka.NewConsumer(c.Config.Map())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	consumer.SubscribeTopics(c.Topics, nil)
 	go c.consumeToChannel(consumer)
@@ -67,13 +65,12 @@ func (c *Consumer) Open() error {
 		c.infoChannel,
 		rxgo.WithBackPressureStrategy(rxgo.Drop),
 	)
-	return nil
+	return c, nil
 }
 
 // Close stop the consumer.
 func (c *Consumer) Close() {
 	c.closeChannel <- true
-	return
 }
 
 // NewConsumer creates a Consumer via config and topics.
@@ -81,6 +78,8 @@ func NewConsumer(config *Config, topics ...string) (*Consumer, error) {
 	consumer := &Consumer{
 		Config: config,
 		Topics: topics,
+		eventChannel: make(chan rxgo.Item),
+		infoChannel: make(chan rxgo.Item),
 	}
-	return consumer, consumer.Open()
+	return consumer.Open()
 }
