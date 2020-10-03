@@ -131,6 +131,7 @@ func produceTopic(brokers []string, topics []string, clientID string) {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("Start producing:")
 	for info := range testProducer.GetInfos().Observe() {
 		fmt.Println(info)
 	}

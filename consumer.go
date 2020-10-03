@@ -76,10 +76,10 @@ func (c *Consumer) Close() {
 // NewConsumer creates a Consumer via config and topics.
 func NewConsumer(config *Config, topics ...string) (*Consumer, error) {
 	consumer := &Consumer{
-		Config: config,
-		Topics: topics,
+		Config:       config,
+		Topics:       topics,
 		eventChannel: make(chan rxgo.Item),
-		infoChannel: make(chan rxgo.Item),
+		infoChannel:  make(chan rxgo.Item),
 	}
 	return consumer.Open()
 }
