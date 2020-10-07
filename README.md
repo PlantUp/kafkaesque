@@ -1,6 +1,6 @@
 
 ![kafkaesque logo](assets/logo.png)
-# Reactive consumers for Apache Kafka
+# Reactive Observables for Apache Kafka
 [![Go Report Card](https://goreportcard.com/badge/github.com/PlantUp/kafkaesque)](https://goreportcard.com/report/github.com/PlantUp/kafkaesque)
 [![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/PlantUp/kafkaesque)](https://pkg.go.dev/mod/github.com/PlantUp/kafkaesque)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)  
